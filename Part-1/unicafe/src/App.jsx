@@ -1,65 +1,71 @@
-const Header = (props) => {
+import { useState } from 'react';
+
+const Title = ({ title }) => {
   return(
-  <div>
-    <h2>{props.course.name}</h2>
-  </div>
+    <h1>{title}</h1>
   )
 }
 
-const Part = (props) => {
+const Button = ({ eventHandler, text}) => {
   return(
-    <p>{props.name} - {props.exercises}</p>
+    <button onClick={eventHandler}>{text}</button>
   )
 }
 
-const Content = (props) => {
-  // console.log(props.parts)
-  return(
-    <div>
-      {props.course.parts.map((name, index) => (
-        <Part key={index} name={name.name} exercises={name.exercises} />
-      ))}
-    </div>
-  )
-}
-
-const Total = (props) => {
-  // console.log(props.parts.reduce((n, exercises) => n + exercises, 0))
-  return(
-    <p>
-      Number of exercises: {
-        props.course.parts.reduce((n, {exercises}) => n + exercises, 0)
-      }
-    </p>
-  )
+const Data = ({ text, stat }) => {
+  return <p>{text}: {stat}</p>
 }
 
 const App = () => {
-  const course = {
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7
-      },
-      {
-        name: 'State of a component',
-        exercises: 14
-      }
-    ]
+  // save clicks of each button to its own state
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+  const [history, setHistory] = useState([]);
+  const [all, setAll] = useState(0);
+  const [mean, setMean] = useState(0);
+
+  // console.log(history); - works
+
+  const averageFeedback = () => 
+    setMean( (good+neutral+bad)/all );
+
+  //*** Feedback Event Functions */
+  //G = Good
+  const goodReview = () => {
+    setHistory(history.concat('G'));
+    setGood(good+1);
+    setAll(all+1);
+    averageFeedback();
   }
+  //N = Neutral
+  const neutralReview = () => {
+    setHistory(history.concat('N'));
+    setNeutral(neutral+1);
+    setAll(all+1);
+  }
+  //B = Bad
+  const badReview = () => {
+    setHistory(history.concat('B'));
+    setBad(bad+1);
+    setAll(all+1);
+  }
+  //* Feedback Event Functions ***/
 
   return (
-    <div>
-      <h1>Couse Information (Exercises 1.1-1.2) </h1>
-      <Header course={course} />
-      <Content course={course} />
-      <Total course={course} />
-    </div>
+    <>
+      <Title title={'give feedback'}/>
+      <Button eventHandler={goodReview} text={'good'} />
+      <Button eventHandler={neutralReview} text={'neutral'} />
+      <Button eventHandler={badReview} text={'bad'} />
+
+      <Title title={'Statistics'} />
+      <Data text={'good'} stat={good} />
+      <Data text={'neutral'} stat={neutral} />
+      <Data text={'bad'} stat={bad} />
+      <Data text={'all'} stat={all} />
+      <Data text={'Average'} stat={all} />
+    </>
   )
 }
 
