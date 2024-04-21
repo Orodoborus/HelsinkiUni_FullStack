@@ -12,8 +12,31 @@ const Button = ({ eventHandler, text}) => {
   )
 }
 
-const Data = ({ text, stat }) => {
-  return <p>{text}: {stat}</p>
+const StatisticLine = ({ text, stat }) => {
+  return (
+    <tr>
+      <td>{text}</td>
+      <td>{stat}</td>
+    </tr>
+  )
+}
+
+const Statistics = (props) => {
+  return(
+    <>
+      <Title title={'Statistics'} />
+      <table>
+        <tbody>
+            <StatisticLine text='good' stat={props.good} />
+            <StatisticLine text='neutral' stat={props.neutral} />
+            <StatisticLine text='bad' stat={props.bad} />
+            <StatisticLine text='all' stat={props.all} />
+            <StatisticLine text='Average' stat={props.mean} />
+            <StatisticLine text='Positive' stat={props.pos_per} />
+        </tbody>
+      </table>
+    </>
+  )
 }
 
 const App = () => {
@@ -24,33 +47,62 @@ const App = () => {
   const [history, setHistory] = useState([]);
   const [all, setAll] = useState(0);
   const [mean, setMean] = useState(0);
+  const [positivePercentage, setPositivePercentage] = useState(0);
 
-  // console.log(history); - works
+  // console.log(history); 
+  // console.log(
+  //   'G:', good, 
+  //   ', N:', neutral, 
+  //   ', B:', bad, 
+  //   'Avg: ', mean,
+  //   'Pos%: ', positivePercentage
+  // );
 
-  const averageFeedback = () => 
-    setMean( (good+neutral+bad)/all );
-
+//Avg Feedback (good: 1, neutral: 0, bad: -1)
+  const averageFeedback = (newFeed) => {
+    let generalFeedback = 0;
+    if(newFeed.length > 1)
+      generalFeedback = newFeed.reduce((first, next) => first + next, 0);
+    else generalFeedback = newFeed[0];
+    setMean( generalFeedback/newFeed.length );
+  }
+//Positive % feedback arrow function
+  const positivePercentageFeedback = 
+    (good, all) => setPositivePercentage( (good/all)*100 + "%");
+  
   //*** Feedback Event Functions */
   //G = Good
   const goodReview = () => {
-    setHistory(history.concat('G'));
-    setGood(good+1);
+    const goodFeedback = good + 1;
+    const allFeedback = all + 1;
+    const newFeed = history.concat(1);
+    setHistory(newFeed);
+    setGood(goodFeedback);
     setAll(all+1);
-    averageFeedback();
+    averageFeedback(newFeed);
+    positivePercentageFeedback(goodFeedback, allFeedback);
   }
   //N = Neutral
   const neutralReview = () => {
-    setHistory(history.concat('N'));
+    const allFeedback = all + 1;
+    const newFeed = history.concat(0);
+    setHistory(newFeed);
     setNeutral(neutral+1);
-    setAll(all+1);
+    setAll(allFeedback);
+    averageFeedback(newFeed);
+    positivePercentageFeedback(good, allFeedback);
   }
   //B = Bad
   const badReview = () => {
-    setHistory(history.concat('B'));
+    const allFeedback = all + 1;
+    const newFeed = history.concat(-1);
+    setHistory(newFeed);
     setBad(bad+1);
     setAll(all+1);
+    averageFeedback(newFeed);
+    positivePercentageFeedback(good, allFeedback);
   }
-  //* Feedback Event Functions ***/
+  /* Feedback Event Functions ***/
 
   return (
     <>
@@ -59,12 +111,14 @@ const App = () => {
       <Button eventHandler={neutralReview} text={'neutral'} />
       <Button eventHandler={badReview} text={'bad'} />
 
-      <Title title={'Statistics'} />
-      <Data text={'good'} stat={good} />
-      <Data text={'neutral'} stat={neutral} />
-      <Data text={'bad'} stat={bad} />
-      <Data text={'all'} stat={all} />
-      <Data text={'Average'} stat={all} />
+      <Statistics 
+        good    = {good} 
+        neutral = {neutral}
+        bad     = {bad}
+        all     = {all}
+        mean    = {mean}
+        pos_per = {positivePercentage}
+      />
     </>
   )
 }
