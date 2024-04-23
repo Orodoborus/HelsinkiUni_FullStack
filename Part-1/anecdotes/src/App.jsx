@@ -63,7 +63,6 @@ const App = () => {
       <p>has {votes} votes</p>
       <Button handleRandom={handleVote} text='Vote' />
       <Button handleRandom={handleRandom} text='Next anecdote' />
-
       <Title title='Anecdote with most votes' />
       {anecdotes[votedAnecdote]}
       <p>has {mostVotes} votes</p>

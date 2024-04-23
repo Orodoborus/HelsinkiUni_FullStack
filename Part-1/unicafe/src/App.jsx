@@ -110,7 +110,6 @@ const App = () => {
       <Button eventHandler={goodReview} text={'good'} />
       <Button eventHandler={neutralReview} text={'neutral'} />
       <Button eventHandler={badReview} text={'bad'} />
-
       <Statistics 
         good    = {good} 
         neutral = {neutral}
